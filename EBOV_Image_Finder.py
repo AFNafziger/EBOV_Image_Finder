@@ -13,7 +13,7 @@ class ImageFinderApp(ttkb.Window):
     def __init__(self):
         super().__init__(themename="vapor")
         self.title("")
-        self.geometry("600x500")
+        self.geometry("300x300")
         self.resizable(False, False)
 
         # UI
@@ -74,13 +74,27 @@ class ImageFinderApp(ttkb.Window):
         try:
             img = Image.open(full_path)
             img.thumbnail((400, 400))
-            self.tk_image = ImageTk.PhotoImage(img)
-            self.img_canvas.config(image=self.tk_image)
+            #self.tk_image = ImageTk.PhotoImage(img)
+            #self.img_canvas.config(image=self.tk_image)
             self.current_image_path = full_path
             self.download_btn.config(state="normal")
+            self.open_image_window(img)  # Open in new window
         except Exception as e:
             messagebox.showerror("Image Error", f"Failed to open image:\n{e}")
             self.download_btn.config(state="disabled")
+
+    def open_image_window(self, pil_image):
+        """Open the image in a new separate window."""
+        new_win = tk.Toplevel(self)
+        new_win.title("Image Viewer")
+        new_win.geometry("500x500")
+        img = pil_image.copy()
+        img.thumbnail((480, 480))
+        tk_img = ImageTk.PhotoImage(img)
+        lbl = tk.Label(new_win, image=tk_img)
+        lbl.image = tk_img  # Keep reference for label
+        new_win.tk_img = tk_img  # Keep reference for window
+        lbl.pack(expand=True, fill="both")
 
     def download_image(self):
         if not self.current_image_path:
